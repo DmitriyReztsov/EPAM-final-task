@@ -1,0 +1,5 @@
+asyncio==3.4.3
+black==21.10b0
+isort==5.10.1
+python-dotenv==0.19.2
+websockets==10.1
