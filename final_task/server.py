@@ -33,26 +33,27 @@ async def execution(websocket, text):
         )
         for line in iter(proc.stdout.readline, ""):
             line = line.rstrip()
-            # yield line
             await websocket.send(line)
 
         for line in iter(proc.stderr.readline, ""):
             line = line.rstrip()
-            # yield line
             await websocket.send(line)
 
 
 async def start_server(websocket):
     async for text in websocket:
-        await websocket.send("got it")
+        await websocket.send("start execution")
         print(f">>> {text} <<<")
+        text += "import sys\n" \
+            "sys.modules['os'] = None" \
+            "del __builtins__.open" \
+            "del __builtins__.exec" \
+            "del __builtins__.eval"
         try:
             await asyncio.wait_for(execution(websocket, text), timeout=TIMEOUT)
         except asyncio.TimeoutError:
             await websocket.send("TIMEOUT ! ! !")
-        """async for result in execution(text):
-            await websocket.send(result)"""
-        await websocket.send("got it")
+        await websocket.send("that's all, folks")
 
 
 server = websockets.serve(start_server, "", 3000)
