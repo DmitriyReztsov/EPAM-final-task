@@ -24,7 +24,7 @@ async def execution(websocket, text):
         path = os.path.abspath(file.name)
 
     with file_open(path):
-        proc = subprocess.Popen(
+        proc = subprocess.Popen(  # -c
             ["python", "-u", path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -45,10 +45,10 @@ async def start_server(websocket):
         await websocket.send("start execution")
         print(f">>> {text} <<<")
         text += "import sys\n" \
-            "sys.modules['os'] = None" \
-            "del __builtins__.open" \
-            "del __builtins__.exec" \
-            "del __builtins__.eval"
+            "sys.modules['os'] = None\n" \
+            "del __builtins__.open\n" \
+            "del __builtins__.exec\n" \
+            "del __builtins__.eval\n\n"
         try:
             await asyncio.wait_for(execution(websocket, text), timeout=TIMEOUT)
         except asyncio.TimeoutError:
